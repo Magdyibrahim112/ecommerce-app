@@ -19,6 +19,10 @@ dependencies:
   flutter_native_splash:
   readmore:
   smooth_page_indicator:
+  dartz: ^0.10.1
+  dio: ^5.9.0
+  flutter_bloc: ^9.1.1
+  fluttertoast: ^9.0.0
 
 dev_dependencies:
   flutter_test:

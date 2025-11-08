@@ -1,11 +1,14 @@
 import 'package:ecommerce_app/core/resources/assets_manager.dart';
 import 'package:ecommerce_app/core/resources/color_manager.dart';
+import 'package:ecommerce_app/core/resources/ui_utils.dart';
 import 'package:ecommerce_app/core/resources/values_manager.dart';
 import 'package:ecommerce_app/core/routes_manager/routes.dart';
 import 'package:ecommerce_app/core/widget/custom_elevated_button.dart';
 import 'package:ecommerce_app/core/widget/main_text_field.dart';
 import 'package:ecommerce_app/core/widget/validators.dart';
+import 'package:ecommerce_app/features/auth/presentation/cubit/register_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -85,17 +88,35 @@ class SignInScreen extends StatelessWidget {
                 Center(
                   child: SizedBox(
                     // width: MediaQuery.of(context).size.width * .8,
-                    child: CustomElevatedButton(
-                      // borderRadius: AppSize.s8,
-                      isStadiumBorder: false,
-                      label: 'Login',
-                      backgroundColor: ColorManager.white,
-                      textStyle: getBoldStyle(
-                          color: ColorManager.primary, fontSize: AppSize.s18),
-                      onTap: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, Routes.mainRoute, (route) => false);
-                      },
+                    child: BlocListener<AuthCubit, AuthState>(
+                      listener: (context, state){
+                        if(state is LoginLoading){
+
+                          UIUtils.showLoading(context);
+                        }else if(state is LoginError){
+                          UIUtils.hideDialog(context);
+                          UIUtils.showToastMessage("Error Occurred", Colors.red);
+
+                        }else if(state is LoginSuccess){
+                          UIUtils.hideDialog(context);
+                          UIUtils.showToastMessage("User Logged-In Successfully", Colors.green);
+                          Navigator.pushReplacementNamed(context, Routes.mainRoute);
+                        }
+                      }
+                      ,
+
+                      child: CustomElevatedButton(
+                        // borderRadius: AppSize.s8,
+                        isStadiumBorder: false,
+                        label: 'Login',
+                        backgroundColor: ColorManager.white,
+                        textStyle: getBoldStyle(
+                            color: ColorManager.primary, fontSize: AppSize.s18),
+                        onTap: () {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, Routes.mainRoute, (route) => false);
+                        },
+                      ),
                     ),
                   ),
                 ),

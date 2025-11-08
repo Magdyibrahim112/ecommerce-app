@@ -56,3 +56,9 @@ class AppConstants {
     }
   ];
 }
+abstract class ApiConstant{
+  static const String baseURL = "https://ecommerce.routemisr.com/api/v1/";
+  static const String singInEndPoint = "auth/signin";
+  static const String signUpEndPoint = "auth/signup";
+
+}

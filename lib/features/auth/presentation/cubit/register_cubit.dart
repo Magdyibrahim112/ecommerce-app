@@ -1,15 +1,19 @@
 import 'package:ecommerce_app/features/auth/data/models/LoginRequest.dart';
 import 'package:ecommerce_app/features/auth/data/models/RegisterRequest.dart';
-import 'package:ecommerce_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:ecommerce_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:ecommerce_app/features/auth/domain/use_cases/login_usecase.dart';
+import 'package:ecommerce_app/features/auth/domain/use_cases/register_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:injectable/injectable.dart';
+@singleton
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit({required this.authRepository}) : super(AuthInitial());
-  AuthRepository authRepository;
+  AuthCubit({required this.registerUseCase, required this.loginUseCase}) : super(AuthInitial());
+ RegisterUseCase registerUseCase;
+ LoginUseCase loginUseCase;
 
  void  register(RegisterRequest request) async {
     emit(RegisterLoading());
-    var result = await authRepository.register(request);
+    var result = await registerUseCase(request);
     result.fold((error) {
       emit(RegisterError(errorMessage: error));
     }, (registerResponse) {
@@ -20,7 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   void login(LoginRequest request)async{
    emit(LoginLoading());
-    var result = await authRepository.login(request);
+    var result = await loginUseCase(request);
     result.fold((error){
       emit(LoginError(errorMessage: error));
     }, (loginResponse){

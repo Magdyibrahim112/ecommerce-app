@@ -1,0 +1,41 @@
+import 'package:dartz/dartz.dart';
+import 'package:ecommerce_app/core/errors/app_exception.dart';
+import 'package:ecommerce_app/core/errors/failure.dart';
+import 'package:ecommerce_app/features/auth/data/data_sources/local/auth_local_data_source.dart';
+import 'package:ecommerce_app/features/auth/data/data_sources/remote/auth_remote_data_source.dart';
+import 'package:ecommerce_app/features/auth/data/models/LoginRequest.dart';
+import 'package:ecommerce_app/features/auth/data/models/RegisterRequest.dart';
+import 'package:ecommerce_app/features/auth/data/models/User.dart';
+import 'package:ecommerce_app/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:ecommerce_app/features/auth/repositories_contract/auth_repository.dart';
+import 'package:injectable/injectable.dart';
+@Singleton(as: AuthRepository)
+class AuthRepositoryImpl implements AuthRepository {
+  AuthRemoteDataSource remoteDataSource;
+  AuthLocalDataSource localDataSource;
+
+  AuthRepositoryImpl(
+      {required this.remoteDataSource, required this.localDataSource});
+
+  @override
+  Future<Either<Failure, User>> register(RegisterRequest request) async {
+    try {
+      final response = await remoteDataSource.register(request);
+      await localDataSource.saveToken(response.token);
+      return Right(response.user);
+    } on AppException catch (exception) {
+      return Left(Failure(message: exception.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> login(LoginRequest request) async {
+    try{
+      final response = await remoteDataSource.login(request);
+      await localDataSource.saveToken(response.token);
+      return Right(response.user);
+    }on AppException catch(exception){
+      return Left(Failure(message: exception.message));
+    }
+  }
+}

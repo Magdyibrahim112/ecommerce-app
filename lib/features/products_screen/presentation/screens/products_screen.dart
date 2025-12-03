@@ -6,10 +6,11 @@ import '../../../../core/resources/assets_manager.dart';
 import '../../../../core/widget/home_screen_app_bar.dart';
 
 class ProductsScreen extends StatelessWidget {
-  const ProductsScreen({super.key});
-
+  const ProductsScreen({super.key, required this.categoryId});
+final String categoryId;
   @override
   Widget build(BuildContext context) {
+    print("CategoryID$categoryId");
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(

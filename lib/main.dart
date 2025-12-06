@@ -4,6 +4,7 @@ import 'package:ecommerce_app/features/auth/data/data_sources/local/auth_shared_
 import 'package:ecommerce_app/features/auth/data/data_sources/remote/auht_api_remote_data_source.dart';
 import 'package:ecommerce_app/features/auth/data/repositories_impl/auth_repository_impl.dart';
 import 'package:ecommerce_app/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:ecommerce_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,8 +13,11 @@ import 'core/routes_manager/route_generator.dart';
 
 void main() {
   setup();
-  runApp(BlocProvider(
-      create: (context)=> serviceLocator.get<AuthCubit>(),
+  runApp(MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context)=> serviceLocator.get<AuthCubit>()),
+        BlocProvider(create: (context)=> serviceLocator.get<CartCubit>()),
+      ],
       child: const MainApp()));
 }
 

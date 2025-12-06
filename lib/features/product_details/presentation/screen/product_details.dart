@@ -1,7 +1,10 @@
+import 'package:ecommerce_app/core/resources/UI_Utils.dart';
 import 'package:ecommerce_app/core/resources/assets_manager.dart';
 import 'package:ecommerce_app/core/resources/color_manager.dart';
 import 'package:ecommerce_app/core/resources/styles_manager.dart';
+import 'package:ecommerce_app/core/routes_manager/routes.dart';
 import 'package:ecommerce_app/core/widget/custom_elevated_button.dart';
+import 'package:ecommerce_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:ecommerce_app/features/product_details/presentation/widgets/product_color.dart';
 import 'package:ecommerce_app/features/product_details/presentation/widgets/product_description.dart';
 import 'package:ecommerce_app/features/product_details/presentation/widgets/product_item.dart';
@@ -9,14 +12,26 @@ import 'package:ecommerce_app/features/product_details/presentation/widgets/prod
 import 'package:ecommerce_app/features/product_details/presentation/widgets/product_rating.dart';
 import 'package:ecommerce_app/features/product_details/presentation/widgets/product_size.dart';
 import 'package:ecommerce_app/features/product_details/presentation/widgets/product_slider.dart';
+import 'package:ecommerce_app/features/products_screen/domain/entities/product_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ProductDetails extends StatelessWidget {
-  const ProductDetails({super.key});
+class ProductDetails extends StatefulWidget {
+  const ProductDetails({super.key, required this.product});
+final ProductEntity product;
 
   @override
+  State<ProductDetails> createState() => _ProductDetailsState();
+}
+
+class _ProductDetailsState extends State<ProductDetails> {
+  int quantity = 1;
+  @override
   Widget build(BuildContext context) {
+    CartCubit cartCubit = BlocProvider.of<CartCubit>(context);
+    print("price after dis : ${widget.product.priceAfterDiscount}");
+    print("price : ${widget.product.price}");
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -33,7 +48,9 @@ class ProductDetails extends StatelessWidget {
                 color: ColorManager.primary,
               )),
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, Routes.cartRoute);
+              },
               icon: Icon(
                 Icons.shopping_cart_outlined,
                 color: ColorManager.primary,
@@ -45,36 +62,41 @@ class ProductDetails extends StatelessWidget {
           padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 50.h),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const ProductSlider(items: [
-              ProductItem(
-                imageUrl:
-                    'https://assets.adidas.com/images/w_1880,f_auto,q_auto/6776024790f445b0873ee66fdcde54a1_9366/GX6544_HM3_hover.jpg',
-              ),
-              ProductItem(
-                imageUrl:
-                    'https://assets.adidas.com/images/w_1880,f_auto,q_auto/6776024790f445b0873ee66fdcde54a1_9366/GX6544_HM3_hover.jpg',
-              ),
-              ProductItem(
-                imageUrl:
-                    "https://assets.adidas.com/images/w_1880,f_auto,q_auto/6776024790f445b0873ee66fdcde54a1_9366/GX6544_HM3_hover.jpg",
-              )
-            ], initialIndex: 0),
+             ProductSlider(images: widget.product.images ,initialIndex: 0),
             SizedBox(
               height: 24.h,
             ),
-            const ProductLabel(
-                productName: 'Nike Air Jordon', productPrice: 'EGP 3,500'),
+             ProductLabel(
+                productName: widget.product.title, productPrice: 'EGP ${widget.product.priceAfterDiscount ?? widget.product.price}'),
             SizedBox(
               height: 16.h,
             ),
-            const ProductRating(
-                productBuyers: '3,230', productRating: '4.8 (7,500)'),
+             ProductRating(
+               increment: (_){
+                 quantity++;
+                 setState(() {
+
+                 });
+               },
+                 decrement: (_){
+                 if(quantity <= 1){
+                   quantity = 1;
+                 }else{
+                   quantity--;
+                 }
+
+                 setState(() {
+
+                 });
+                 },
+                 quantity: quantity,
+                productBuyers: "${widget.product.sold ?? 0}", productRating: '${widget.product.ratingsAverage} (${widget.product.ratingsQuantity})'),
             SizedBox(
               height: 16.h,
             ),
-            const ProductDescription(
-                productDescription:
-                    'Nike is a multinational corporation that designs, develops, and sells athletic footwear ,apparel, and accessories'),
+             ProductDescription(
+                productDescription:widget.product.description
+                    ),
             ProductSize(
               size: const [35, 38, 39, 40],
               onSelected: () {},
@@ -107,7 +129,7 @@ class ProductDetails extends StatelessWidget {
                     SizedBox(
                       height: 12.h,
                     ),
-                    Text('EGP 3,500',
+                    Text('EGP ${(widget.product.priceAfterDiscount ?? widget.product.price) * quantity}',
                         style:
                             getMediumStyle(color: ColorManager.appBarTitleColor)
                                 .copyWith(fontSize: 18.sp))
@@ -117,12 +139,31 @@ class ProductDetails extends StatelessWidget {
                   width: 33.w,
                 ),
                 Expanded(
-                  child: CustomElevatedButton(
-                    label: 'Add to cart',
-                    onTap: () {},
-                    prefixIcon: Icon(
-                      Icons.add_shopping_cart_outlined,
-                      color: ColorManager.white,
+                  child: BlocListener<CartCubit, CartState>(
+                    listener: (context2, state){
+                      if(state is AddToCartLoading){
+                        UIUtils.showLoading(context2);
+                      }else if (state is AddToCartError){
+                        UIUtils.hideDialog(context2);
+                        UIUtils.showToastMessage(state.message, Colors.red);
+                      }else if (state is AddToCartSuccess) {
+                        UIUtils.hideDialog(context2);
+                        UIUtils.showToastMessage("Product Added", Colors.green);
+                        Navigator.pushNamed(context, Routes.cartRoute);
+
+                      }
+                    },
+
+                    child: CustomElevatedButton(
+                      label: 'Add to cart',
+                      onTap: ()async{
+                       await cartCubit.addToCart(productId: widget.product.id);
+
+                      },
+                      prefixIcon: Icon(
+                        Icons.add_shopping_cart_outlined,
+                        color: ColorManager.white,
+                      ),
                     ),
                   ),
                 )

@@ -63,6 +63,8 @@ abstract class ApiConstant{
   static const String loginEndPoint = 'auth/signin';
   static const String categoriesEndPoint = 'categories';
   static const String brandsEndPoint = 'brands';
+  static const String productsEndPoint = 'products';
+  static const String cartEndPoint = 'cart';
 }
 
 abstract class CacheConstant{

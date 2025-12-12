@@ -1,0 +1,12 @@
+import 'package:dartz/dartz.dart';
+import 'package:ecommerce_app/core/errors/failure.dart';
+import 'package:ecommerce_app/features/auth/data/models/LoginRequest.dart';
+import 'package:ecommerce_app/features/auth/data/models/RegisterRequest.dart';
+import 'package:ecommerce_app/features/auth/data/models/User.dart';
+import 'package:ecommerce_app/features/auth/domain/entites/user_entity.dart';
+
+// the interface of the data layer
+abstract class AuthRepository {
+  Future<Either<Failure, UserEntity>> register(RegisterRequest request);
+  Future<Either<Failure, UserEntity>> login(LoginRequest request);
+}

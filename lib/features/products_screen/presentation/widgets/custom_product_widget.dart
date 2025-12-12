@@ -2,29 +2,20 @@ import 'package:ecommerce_app/core/resources/color_manager.dart';
 import 'package:ecommerce_app/core/resources/styles_manager.dart';
 import 'package:ecommerce_app/core/routes_manager/routes.dart';
 import 'package:ecommerce_app/core/widget/heart_button.dart';
+import 'package:ecommerce_app/features/products_screen/domain/entities/product_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomProductWidget extends StatelessWidget {
   final double width;
   final double height;
-  final String image;
-  final String title;
-  final String description;
-  final double price;
-  final double discountPercentage;
-  final double rating;
+  ProductEntity product;
 
-  const CustomProductWidget({
+   CustomProductWidget({
     super.key,
     required this.width,
     required this.height,
-    required this.image,
-    required this.title,
-    required this.description,
-    required this.price,
-    required this.discountPercentage,
-    required this.rating,
+    required this.product
   });
 
   String truncateTitle(String title) {
@@ -85,8 +76,8 @@ class CustomProductWidget extends StatelessWidget {
                   ClipRRect(
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(14.r)),
-                    child: Image.asset(
-                      image,
+                    child: Image.network(
+                      product.imageCover,
                       fit: BoxFit.cover,
                       width: width,
                     ),
@@ -106,7 +97,7 @@ class CustomProductWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      truncateTitle(title),
+                      truncateTitle(product.title),
                       style: getMediumStyle(
                         color: ColorManager.textColor,
                         fontSize: 14.sp,
@@ -114,7 +105,7 @@ class CustomProductWidget extends StatelessWidget {
                     ),
                     SizedBox(height: height * 0.002),
                     Text(
-                      truncateDescription(description),
+                      truncateDescription(product.description),
                       style: getRegularStyle(
                         color: ColorManager.textColor,
                         fontSize: 14.sp,
@@ -127,14 +118,14 @@ class CustomProductWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "EGP $price",
+                            "EGP ${product.price}",
                             style: getRegularStyle(
                               color: ColorManager.textColor,
                               fontSize: 14.sp,
                             ),
                           ),
                           Text(
-                            "$discountPercentage %",
+                            "${product.price} %",
                             style: getTextWithLine(),
                           ),
                         ],
@@ -150,7 +141,7 @@ class CustomProductWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Review ($rating)",
+                                "Review (${product.ratingsAverage})",
                                 style: getRegularStyle(
                                   color: ColorManager.textColor,
                                   fontSize: 12.sp,

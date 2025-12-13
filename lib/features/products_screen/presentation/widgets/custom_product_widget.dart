@@ -9,9 +9,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CustomProductWidget extends StatelessWidget {
   final double width;
   final double height;
-  ProductEntity product;
+  final ProductEntity product;
 
-   CustomProductWidget({
+  const CustomProductWidget({
     super.key,
     required this.width,
     required this.height,
@@ -39,10 +39,8 @@ class CustomProductWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, Routes.productDetails),
+      onTap: () => Navigator.pushNamed(context, Routes.productDetails, arguments: product),
       child: Container(
-        width: width * 0.4,
-        height: height * 0.3,
         decoration: BoxDecoration(
           border: Border.all(
             color: ColorManager.primary.withOpacity(0.3),
@@ -56,120 +54,104 @@ class CustomProductWidget extends StatelessWidget {
             Expanded(
               flex: 5,
               child: Stack(
-                alignment: AlignmentDirectional.center,
+                fit: StackFit.expand,
                 children: [
-                  // Not working with the lastest flutter version
-
-                  // CachedNetworkImage(
-                  //   imageUrl: image,
-                  //   height: height * 0.15,
-                  //   width: double.infinity,
-                  //   fit: BoxFit.cover,
-                  //   placeholder: (context, url) =>
-                  //       const Center(child: CircularProgressIndicator()),
-                  //   errorWidget: (context, url, error) => const Icon(Icons.error),
-                  // ),
-                  // Image.network(
-                  //   image,
-                  //   fit: BoxFit.cover,
-                  // ),
                   ClipRRect(
                     borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(14.r)),
+                    BorderRadius.vertical(top: Radius.circular(14.r)),
                     child: Image.network(
-                      product.imageCover,
+                      product.imageCover ?? '',
                       fit: BoxFit.cover,
-                      width: width,
+                      errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.error)),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(child: CircularProgressIndicator());
+                      },
                     ),
                   ),
                   Positioned(
-                      top: height * 0.01,
-                      right: width * 0.02,
-                      child: HeartButton(onTap: () {})),
+                    top: 8,
+                    right: 8,
+                    child: HeartButton(onTap: () {}),
+                  ),
                 ],
               ),
             ),
             Expanded(
               flex: 5,
               child: Padding(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    // العنوان
                     Text(
-                      truncateTitle(product.title),
+                      truncateTitle(product.title ?? ''),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: getMediumStyle(
                         color: ColorManager.textColor,
                         fontSize: 14.sp,
                       ),
                     ),
-                    SizedBox(height: height * 0.002),
+                    // الوصف
                     Text(
-                      truncateDescription(product.description),
+                      truncateDescription(product.description ?? ''),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: getRegularStyle(
                         color: ColorManager.textColor,
-                        fontSize: 14.sp,
+                        fontSize: 12.sp, // تصغير الخط قليلاً لتوفير مساحة
                       ),
                     ),
-                    SizedBox(height: height * 0.01),
-                    SizedBox(
-                      width: width * 0.3,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "EGP ${product.price}",
-                            style: getRegularStyle(
-                              color: ColorManager.textColor,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                          Text(
-                            "${product.price} %",
-                            style: getTextWithLine(),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // SizedBox(height: height * 0.005),
+
+                    // --- السعر (هذا هو الجزء الذي تم إصلاحه) ---
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          // width: width * 0.22,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Review (${product.ratingsAverage})",
-                                style: getRegularStyle(
-                                  color: ColorManager.textColor,
-                                  fontSize: 12.sp,
-                                ),
-                              ),
-                              const Icon(
-                                Icons.star_rate_rounded,
-                                color: ColorManager.starRateColor,
-                              ),
-                            ],
+                        Text(
+                          "EGP ${product.priceAfterDiscount ?? product.price}",
+                          style: getRegularStyle(
+                            color: ColorManager.textColor,
+                            fontSize: 14.sp,
                           ),
                         ),
+                        const SizedBox(width: 8),
+                        // إظهار السعر القديم فقط إذا كان هناك خصم
+                        if (product.priceAfterDiscount != null)
+                          Text(
+                            "${product.price}",
+                            style: getTextWithLine(),
+                          ),
+                      ],
+                    ),
+
+                    // التقييم وزر الإضافة
+                    Row(
+                      children: [
+                        Text(
+                          "Review (${product.ratingsAverage})",
+                          style: getRegularStyle(
+                            color: ColorManager.textColor,
+                            fontSize: 12.sp,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.star_rate_rounded,
+                          color: ColorManager.starRateColor,
+                          size: 16,
+                        ),
                         const Spacer(),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Container(
-                              height: height * 0.036,
-                              width: width * 0.08,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: ColorManager.primary,
-                              ),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                              ),
+                        InkWell(
+                          onTap: () {},
+                          child: CircleAvatar(
+                            radius: 15,
+                            backgroundColor: ColorManager.primary,
+                            child: const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                              size: 18,
                             ),
                           ),
                         ),

@@ -23,7 +23,7 @@ class ProductsScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(AppPadding.p16),
         child: BlocProvider(
-          create: (context) => getIt<ProductsCubit>()..getProducts(),
+          create: (context) => getIt<ProductsCubit>()..getProducts(categoryId),
           child: Column(
             children: [
               BlocBuilder<ProductsCubit, ProductsState>(

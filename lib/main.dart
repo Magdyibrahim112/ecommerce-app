@@ -1,19 +1,21 @@
 import 'package:ecommerce_app/core/di/di.dart';
 import 'package:ecommerce_app/core/routes_manager/routes.dart';
-import 'package:ecommerce_app/features/auth/data/data_sources/remote/auth_api_remote_data_source.dart';
-import 'package:ecommerce_app/features/auth/data/repositories_impl/auth_repository_impl.dart';
 import 'package:ecommerce_app/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:ecommerce_app/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // <-- 1. أضف هذا الاستيراد
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/routes_manager/route_generator.dart';
-import 'features/auth/data/data_sources/local/auth_shared_prefs_local_data_source.dart';
 
 void main() {
   configureDependencies();
-  runApp(BlocProvider(
-      create: (context) => getIt<AuthCubit>(),
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (context)=> getIt.get<AuthCubit>()),
+      BlocProvider(create: (context)=> getIt.get<CartCubit>())
+
+    ],
       child: const MainApp()));
 }
 
@@ -30,7 +32,7 @@ class MainApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: child,
         onGenerateRoute: RouteGenerator.getRoute,
-        initialRoute: Routes.mainRoute,
+        initialRoute: Routes.signInRoute,
       ),
     );
   }

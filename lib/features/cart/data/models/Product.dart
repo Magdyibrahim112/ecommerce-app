@@ -1,63 +1,41 @@
-// import 'Subcategory.dart';
-// import 'Category.dart';
-// import 'Brand.dart';
-//
-// class Product {
-//   Product({
-//       this.subcategory,
-//       this.id,
-//       this.title,
-//       this.quantity,
-//       this.imageCover,
-//       this.category,
-//       this.brand,
-//       this.ratingsAverage,
-//       this.id,});
-//
-//   Product.fromJson(dynamic json) {
-//     if (json['subcategory'] != null) {
-//       subcategory = [];
-//       json['subcategory'].forEach((v) {
-//         subcategory.add(Subcategory.fromJson(v));
-//       });
-//     }
-//     id = json['_id'];
-//     title = json['title'];
-//     quantity = json['quantity'];
-//     imageCover = json['imageCover'];
-//     category = json['category'] != null ? Category.fromJson(json['category']) : null;
-//     brand = json['brand'] != null ? Brand.fromJson(json['brand']) : null;
-//     ratingsAverage = json['ratingsAverage'];
-//     id = json['id'];
-//   }
-//   List<Subcategory> subcategory;
-//   String id;
-//   String title;
-//   int quantity;
-//   String imageCover;
-//   Category category;
-//   Brand brand;
-//   double ratingsAverage;
-//   String id;
-//
-//   Map<String, dynamic> toJson() {
-//     final map = <String, dynamic>{};
-//     if (subcategory != null) {
-//       map['subcategory'] = subcategory.map((v) => v.toJson()).toList();
-//     }
-//     map['_id'] = id;
-//     map['title'] = title;
-//     map['quantity'] = quantity;
-//     map['imageCover'] = imageCover;
-//     if (category != null) {
-//       map['category'] = category.toJson();
-//     }
-//     if (brand != null) {
-//       map['brand'] = brand.toJson();
-//     }
-//     map['ratingsAverage'] = ratingsAverage;
-//     map['id'] = id;
-//     return map;
-//   }
-//
-// }
+
+import 'package:ecommerce_app/features/cart/domain/entities/product_entity.dart';
+import 'package:ecommerce_app/features/main_layout/home/data/models/brands_response/brand.dart';
+import 'package:ecommerce_app/features/main_layout/home/data/models/category_response/category.dart';
+
+class Product {
+  const Product({
+    required this.id,
+    required this.title,
+    //required this.quantity,
+    required this.imageCover,
+    // required this.category,
+    // required this.brand,
+    required this.ratingsAverage,
+  });
+
+  factory Product.fromJson(dynamic json) {
+    return Product(
+        id: json['_id'],
+        title: json['title'],
+        //quantity: json['quantity'],
+        imageCover: json['imageCover'],
+        // category: Category.fromJson(json['category']),
+        // brand: Brand.fromJson(json['brand']),
+        ratingsAverage: (json['ratingsAverage'] as num).toDouble());
+  }
+  final String id;
+  final String title;
+  //final int quantity;
+  final String imageCover;
+  // final Category category;
+  // final Brand brand;
+  final double ratingsAverage;
+
+  ProductEntity toProductEntity()=>
+      ProductEntity(
+          id: id,
+          title: title,
+          //quantity: quantity,
+          imageCover: imageCover);
+}
